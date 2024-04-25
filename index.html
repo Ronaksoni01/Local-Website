@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div class="calculator">
+    <div class="display"></div>
+    <div class="buttons">
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>+</button>
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+      <button>-</button>
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+      <button>*</button>
+      <button>.</button>
+      <button>0</button>
+      <button data-action="clear">C</button>
+      <button data-action="calculate">=</button>
+    </div>
+  </div>
+  <script>
+    const calculator = document.querySelector('.calculator')
+    const display = document.querySelector('.display')
+    const buttons = Array.from(document.querySelectorAll('.buttons button'))
+    let firstValue = null
+    let operator = null
+    let secondValue = null
+    let shouldResetDisplay = false
+
+    const calculate = (n1, operator, n2) => {
+      let result = 0
+      if (operator === 'add') {
+        result = n1 + n2
+      } else if (operator === 'subtract') {
+        result = n1 - n2
+      } else if (operator === 'multiply') {
+        result = n1 * n2
+      } else if (operator === 'divide') {
+        result = n1 / n2
+      }
+      return result
+    }
+
+    const updateDisplay = () => {
+      if (shouldResetDisplay) {
+        display.textContent = '0'
+        shouldResetDisplay = false
+      } else {
+        display.textContent = firstValue || secondValue || '0'
+      }
+    }
+
+    buttons.map(button => {
+      button.addEventListener('click', e => {
+        const { action } = e.target.dataset
+        if (!action) {
+          if (shouldResetDisplay) {
+            display.textContent = e.target.textContent
+            shouldResetDisplay = false
+          } else {
+            display.textContent = display.textContent === '0'
+              ? e.target.textContent
+              : display.textContent + e.target.textContent
+          }
+        } else {
+          switch (action) {
+            case 'clear':
+              firstValue = null
+              operator = null
+              secondValue = null
+              shouldResetDisplay = true
+              updateDisplay()
+              break
+            case 'calculate':
+              if (firstValue && operator && secondValue) {
+                firstValue = calculate(firstValue, operator, secondValue)
+                secondValue = null
+                operator = null
+                shouldResetDisplay = true
+              }
+              updateDisplay()
+              break
+            case 'add':
+            case 'subtract':
+            case 'multiply':
+            case 'divide':
+              if (firstValue && secondValue) {
+                shouldResetDisplay = true
+              }
+              operator = action
+              break
+          }
+        }
+      })
+    })
+  </script>
+</body>
+</html>
